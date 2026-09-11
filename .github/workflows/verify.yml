@@ -1,0 +1,82 @@
+name: Verify AutoAgent
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: |
+          python -m pip install -r backend/requirements.txt
+          python -m playwright install --with-deps chromium
+          npm ci --prefix frontend
+          cd frontend
+          npx playwright install --with-deps chromium
+      - name: Static checks and production build
+        run: |
+          python -m ruff check backend sandbox
+          npm run lint --prefix frontend
+          npm run build --prefix frontend
+          npm run typecheck --prefix frontend
+      - name: Build execution sandbox
+        run: docker build -t autoagent-python:local sandbox
+      - name: Backend tests including kernel isolation
+        working-directory: backend
+        env:
+          AUTOAGENT_CONTAINER_TESTS: '1'
+        run: python -m pytest -q
+      - name: Fixture evaluation
+        working-directory: backend
+        run: python -m evaluation.run
+      - name: Fresh Compose startup
+        run: |
+          cp .env.example .env
+          docker compose --profile live up --build --detach
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8000/health && curl --fail --silent --output /dev/null http://127.0.0.1:3000; then
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+      - name: PostgreSQL, broker approval and container cancellation checks
+        run: |
+          docker compose exec -T postgres createdb -U autoagent autoagent_verification_ci
+          docker compose run --rm --no-deps -e AUTOAGENT_TEST_DATABASE_URL=postgresql+psycopg://autoagent:autoagent@postgres:5432/autoagent_verification_ci -e AUTOAGENT_CONTAINER_TESTS=1 -e AUTOAGENT_COMPOSE_TESTS=1 -v "$PWD/backend/tests:/app/tests:ro" -v "$PWD/evaluation:/verification" sandbox python -m pytest /app/tests -q -p no:cacheprovider --junitxml=/verification/docker-tests.xml
+      - name: Worker container recovery
+        run: python scripts/verify_docker_recovery.py
+      - name: Desktop and mobile end-to-end checks against Compose
+        working-directory: frontend
+        run: npm run test:e2e
+      - name: Save Compose diagnostics
+        if: always()
+        run: docker compose logs --no-color > compose-test.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-evidence
+          path: |
+            frontend/test-results/
+            evaluation/fixture-results.json
+            evaluation/docker-tests.xml
+            evaluation/docker-recovery-result.json
+            compose-test.log
+      - name: Stop services
+        if: always()
+        run: docker compose down

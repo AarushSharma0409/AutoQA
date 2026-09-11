@@ -1,0 +1,11 @@
+{
+  "date": "2026-09-11",
+  "status": "passed",
+  "surface": "Docker worker app.tools.search with mode=live",
+  "provider": "tavily",
+  "authentication": "keyless REST; CLI OAuth credentials are not used by the app",
+  "query": "Python official documentation tutorial",
+  "retrieved_public_sources": 4,
+  "fixture": false,
+  "scope": "Real search and bounded public-page retrieval; full model-driven workflow remains unverified"
+}

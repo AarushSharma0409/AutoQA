@@ -1,0 +1,262 @@
+{
+  "rubric": {
+    "behavior": "1 if terminal status matches expected success or controlled failure",
+    "artifact_validity": "1 if all requested names exist and every generated PDF/XLSX parses",
+    "content": "1 if specified numeric first row is correct; report hypotheses and fixture labels preserved where applicable",
+    "citation_traceability": "1 if research sources have HTTP(S) URLs and exact excerpts appear in report; this does NOT measure factual support of model synthesis"
+  },
+  "cases": [
+    {
+      "id": "research-retail",
+      "goal": "Research retail and create a cited report.",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "research-supply-chains",
+      "goal": "Research supply chains and create a cited report.",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "research-education",
+      "goal": "Research education and create a cited report.",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "research-open-source",
+      "goal": "Research open source and create a cited report.",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "research-energy",
+      "goal": "Research energy and create a cited report.",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "research-productivity",
+      "goal": "Research productivity and create a cited report.",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "csv-baseline",
+      "goal": "Analyze this CSV and create a chart, spreadsheet, and report. Rank lowest total revenue first.",
+      "name": "sales.csv",
+      "status": "completed",
+      "files": [
+        "category-analysis.xlsx",
+        "category-revenue.svg",
+        "report.pdf"
+      ],
+      "first_value": 5
+    },
+    {
+      "id": "csv-negatives",
+      "goal": "Analyze this CSV and create a chart, spreadsheet, and report. Rank lowest total revenue first.",
+      "name": "sales.csv",
+      "status": "completed",
+      "files": [
+        "category-analysis.xlsx",
+        "category-revenue.svg",
+        "report.pdf"
+      ],
+      "first_value": -5
+    },
+    {
+      "id": "csv-zeros",
+      "goal": "Analyze this CSV and create a chart, spreadsheet, and report. Rank lowest total revenue first.",
+      "name": "sales.csv",
+      "status": "completed",
+      "files": [
+        "category-analysis.xlsx",
+        "category-revenue.svg",
+        "report.pdf"
+      ],
+      "first_value": 0
+    },
+    {
+      "id": "csv-duplicates",
+      "goal": "Analyze this CSV and create a chart, spreadsheet, and report. Rank lowest total revenue first.",
+      "name": "sales.csv",
+      "status": "completed",
+      "files": [
+        "category-analysis.xlsx",
+        "category-revenue.svg",
+        "report.pdf"
+      ],
+      "first_value": 5
+    },
+    {
+      "id": "csv-missing",
+      "goal": "Analyze this CSV and create a chart, spreadsheet, and report. Rank lowest total revenue first.",
+      "name": "sales.csv",
+      "status": "completed",
+      "files": [
+        "category-analysis.xlsx",
+        "category-revenue.svg",
+        "report.pdf"
+      ],
+      "first_value": 2
+    },
+    {
+      "id": "csv-unicode",
+      "goal": "Analyze this CSV and create a chart, spreadsheet, and report. Rank lowest total revenue first.",
+      "name": "sales.csv",
+      "status": "completed",
+      "files": [
+        "category-analysis.xlsx",
+        "category-revenue.svg",
+        "report.pdf"
+      ],
+      "first_value": 2
+    },
+    {
+      "id": "combined-flagship",
+      "goal": "Analyze sales CSV, research market context, generate report with charts and experiments.",
+      "name": "sales.csv",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf",
+        "category-analysis.xlsx",
+        "category-revenue.svg"
+      ]
+    },
+    {
+      "id": "combined-comparison",
+      "goal": "Analyze sales CSV and research retail benchmarks. Separate facts and hypotheses in a report.",
+      "name": "sales.csv",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf",
+        "category-analysis.xlsx",
+        "category-revenue.svg"
+      ]
+    },
+    {
+      "id": "combined-experiments",
+      "goal": "Analyze CSV, research category context and report testable experiments.",
+      "name": "sales.csv",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf",
+        "category-analysis.xlsx",
+        "category-revenue.svg"
+      ]
+    },
+    {
+      "id": "combined-brief",
+      "goal": "Analyze sales CSV and research market context for a concise cited report.",
+      "name": "sales.csv",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf",
+        "category-analysis.xlsx",
+        "category-revenue.svg"
+      ]
+    },
+    {
+      "id": "text-notes",
+      "goal": "Summarize this text as a report.",
+      "name": "notes.txt",
+      "status": "completed",
+      "files": [
+        "report.md",
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "markdown-notes",
+      "goal": "Summarize this document as a report.",
+      "name": "notes.md",
+      "status": "completed",
+      "files": [
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "pdf-ingestion",
+      "goal": "Read this PDF and create a report.",
+      "name": "notes.pdf",
+      "status": "completed",
+      "files": [
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "browser-extraction",
+      "goal": "Browse https://example.com and extract its purpose in a report.",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.md",
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "browser-research",
+      "goal": "Browse https://example.com and research example domains, then report sources.",
+      "status": "completed",
+      "sources": true,
+      "files": [
+        "report.pdf"
+      ]
+    },
+    {
+      "id": "malformed-csv",
+      "goal": "Analyze this CSV.",
+      "name": "bad.csv",
+      "status": "failed",
+      "files": []
+    },
+    {
+      "id": "missing-column",
+      "goal": "Analyze revenue by category in this CSV.",
+      "name": "bad.csv",
+      "status": "failed",
+      "files": []
+    },
+    {
+      "id": "nonnumeric-csv",
+      "goal": "Analyze this CSV.",
+      "name": "bad.csv",
+      "status": "failed",
+      "files": []
+    }
+  ]
+}

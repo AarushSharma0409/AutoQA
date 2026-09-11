@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-10T08:23:32.078061+00:00",
+  "mode": "live-public-browser",
+  "url": "https://example.com",
+  "uses_model": false,
+  "status": "passed",
+  "result": {
+    "sources": [
+      {
+        "id": "82da790a-1467-4f94-9828-259b024dd2d5",
+        "title": "Example Domain",
+        "url": "https://example.com/",
+        "excerpt": "Example Domain\n\nThis domain is for use in documentation examples without needing permission. Avoid use in operations.\n\nLearn more",
+        "fixture": false
+      }
+    ],
+    "origin": "public browser; scripts disabled"
+  }
+}

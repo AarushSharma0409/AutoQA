@@ -1,0 +1,507 @@
+{
+  "date": "2026-09-11T07:03:21.699997+00:00",
+  "mode": "live",
+  "provider": "https://api.groq.com/openai/v1",
+  "model": "openai/gpt-oss-20b",
+  "python": "3.12.14",
+  "limits": {
+    "steps": 16,
+    "tokens": 30000,
+    "seconds": 600,
+    "estimated_cost": 1.0
+  },
+  "rubric": {
+    "behavior": "1 if terminal status matches expected success or controlled failure",
+    "artifact_validity": "1 if all requested names exist and every generated PDF/XLSX parses",
+    "content": "1 if specified numeric first row is correct; report hypotheses and fixture labels preserved where applicable",
+    "citation_traceability": "1 if research sources have HTTP(S) URLs and exact excerpts appear in report; this does NOT measure factual support of model synthesis"
+  },
+  "status": "finished",
+  "results": [
+    {
+      "id": "research-retail",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 13.5,
+      "usage": {
+        "steps": 3,
+        "tokens": 7457,
+        "cost": 0.07457000000000001,
+        "elapsed": 13.405999999999949
+      },
+      "failure_category": null
+    },
+    {
+      "id": "research-supply-chains",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 1,
+      "max_score": 4,
+      "seconds": 11.484,
+      "usage": {
+        "steps": 1,
+        "tokens": 17482,
+        "cost": 0.17482,
+        "elapsed": 11.483999999999469
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "research-education",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 3,
+      "max_score": 4,
+      "seconds": 34.422,
+      "usage": {
+        "steps": 3,
+        "tokens": 7137,
+        "cost": 0.07137000000000002,
+        "elapsed": 34.38999999999942
+      },
+      "failure_category": null
+    },
+    {
+      "id": "research-open-source",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 1,
+      "max_score": 4,
+      "seconds": 0.187,
+      "usage": {
+        "steps": 0,
+        "tokens": 5296,
+        "cost": 0.05296,
+        "elapsed": 0.1710000000002765
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "research-energy",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 1,
+      "max_score": 4,
+      "seconds": 0.204,
+      "usage": {
+        "steps": 0,
+        "tokens": 5291,
+        "cost": 0.05291,
+        "elapsed": 0.18800000000010186
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "research-productivity",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 1,
+      "max_score": 4,
+      "seconds": 0.281,
+      "usage": {
+        "steps": 0,
+        "tokens": 5297,
+        "cost": 0.05297,
+        "elapsed": 0.25
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "csv-baseline",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 2,
+      "max_score": 4,
+      "seconds": 0.14,
+      "usage": {
+        "steps": 0,
+        "tokens": 5410,
+        "cost": 0.0541,
+        "elapsed": 0.125
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "csv-negatives",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 2,
+      "max_score": 4,
+      "seconds": 0.157,
+      "usage": {
+        "steps": 0,
+        "tokens": 5410,
+        "cost": 0.0541,
+        "elapsed": 0.125
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "csv-zeros",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 2,
+      "max_score": 4,
+      "seconds": 0.125,
+      "usage": {
+        "steps": 0,
+        "tokens": 5410,
+        "cost": 0.0541,
+        "elapsed": 0.09400000000005093
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "csv-duplicates",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 2,
+      "max_score": 4,
+      "seconds": 0.14,
+      "usage": {
+        "steps": 0,
+        "tokens": 5410,
+        "cost": 0.0541,
+        "elapsed": 0.09400000000005093
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "csv-missing",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 2,
+      "max_score": 4,
+      "seconds": 0.125,
+      "usage": {
+        "steps": 0,
+        "tokens": 5410,
+        "cost": 0.0541,
+        "elapsed": 0.10899999999946886
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "csv-unicode",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 2,
+      "max_score": 4,
+      "seconds": 0.157,
+      "usage": {
+        "steps": 0,
+        "tokens": 5410,
+        "cost": 0.0541,
+        "elapsed": 0.10900000000037835
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "combined-flagship",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 1,
+      "max_score": 4,
+      "seconds": 0.125,
+      "usage": {
+        "steps": 0,
+        "tokens": 5404,
+        "cost": 0.05404,
+        "elapsed": 0.10999999999967258
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "combined-comparison",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 1,
+      "max_score": 4,
+      "seconds": 0.156,
+      "usage": {
+        "steps": 0,
+        "tokens": 5408,
+        "cost": 0.05408,
+        "elapsed": 0.125
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "combined-experiments",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 1,
+      "max_score": 4,
+      "seconds": 0.172,
+      "usage": {
+        "steps": 0,
+        "tokens": 5387,
+        "cost": 0.05387,
+        "elapsed": 0.1570000000001528
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "combined-brief",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 1,
+      "max_score": 4,
+      "seconds": 0.14,
+      "usage": {
+        "steps": 0,
+        "tokens": 5389,
+        "cost": 0.05389,
+        "elapsed": 0.125
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "text-notes",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 2,
+      "max_score": 4,
+      "seconds": 0.188,
+      "usage": {
+        "steps": 0,
+        "tokens": 5348,
+        "cost": 0.05348,
+        "elapsed": 0.14000000000032742
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "markdown-notes",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 2,
+      "max_score": 4,
+      "seconds": 0.156,
+      "usage": {
+        "steps": 0,
+        "tokens": 5351,
+        "cost": 0.05351,
+        "elapsed": 0.14099999999962165
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "pdf-ingestion",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 2,
+      "max_score": 4,
+      "seconds": 0.141,
+      "usage": {
+        "steps": 0,
+        "tokens": 5350,
+        "cost": 0.0535,
+        "elapsed": 0.125
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "browser-extraction",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 1,
+      "max_score": 4,
+      "seconds": 0.14,
+      "usage": {
+        "steps": 0,
+        "tokens": 5312,
+        "cost": 0.05312,
+        "elapsed": 0.13999999999941792
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "browser-research",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": false,
+        "content": true,
+        "citation_traceability": false
+      },
+      "score": 1,
+      "max_score": 4,
+      "seconds": 5.157,
+      "usage": {
+        "steps": 1,
+        "tokens": 6502,
+        "cost": 0.06502000000000001,
+        "elapsed": 5.125
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "malformed-csv",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 3,
+      "max_score": 4,
+      "seconds": 0.187,
+      "usage": {
+        "steps": 0,
+        "tokens": 5331,
+        "cost": 0.05331,
+        "elapsed": 0.15599999999994907
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "missing-column",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 3,
+      "max_score": 4,
+      "seconds": 0.313,
+      "usage": {
+        "steps": 0,
+        "tokens": 5354,
+        "cost": 0.05354,
+        "elapsed": 0.2970000000004802
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    },
+    {
+      "id": "nonnumeric-csv",
+      "status": "failed",
+      "checks": {
+        "behavior": false,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 3,
+      "max_score": 4,
+      "seconds": 0.203,
+      "usage": {
+        "steps": 0,
+        "tokens": 5331,
+        "cost": 0.05331,
+        "elapsed": 0.18800000000010186
+      },
+      "failure_category": "Model provider HTTP 429; check quota and tool-call compatibility"
+    }
+  ],
+  "passed": 1,
+  "total": 24,
+  "expected_controlled_failures": 3,
+  "live_semantic_citation_review": "not evaluated; human source-support review required",
+  "audit_note": "Provider HTTP failures are not expected invalid-input failures. Corrected after this run; 22 cases hit HTTP 429."
+}

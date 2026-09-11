@@ -1,0 +1,21 @@
+{
+  "date": "2026-09-11",
+  "status": "passed",
+  "mode": "fixture planner with real Docker/PostgreSQL/Redis/tool execution",
+  "docker_desktop": "4.84.0",
+  "docker_engine": "29.6.2",
+  "compose": "v5.3.1",
+  "platform": "linux/amd64 via WSL2",
+  "fresh_build_and_startup": "passed",
+  "migration": "exited successfully before API and worker startup",
+  "postgres": "17.4",
+  "redis_ping": "PONG",
+  "backend_tests": {"passed": 39, "skipped": 0, "failed": 0, "seconds": 28.59, "evidence": "docker-tests.xml"},
+  "frontend_tests": {"passed": 8, "failed": 0, "seconds": 22.9, "target": "Compose web/API/worker"},
+  "real_sandbox_boundaries": ["no application secrets", "no host environment or Docker socket", "outbound network denied", "root filesystem read-only", "memory limit enforced"],
+  "approved_python_chart": "passed: NumPy calculation, Matplotlib PNG, authenticated artifact download",
+  "container_cancellation": "passed: canceled task removed its running container",
+  "public_browser": {"status": "passed", "url": "https://example.com/", "title": "Example Domain", "fixture": false, "process": "non-root Compose worker", "uses_model": false},
+  "worker_recovery": {"status": "passed", "seconds_after_sigkill": 35.609, "artifacts": 4, "evidence": "docker-recovery-result.json"},
+  "live_model_evaluation": {"status": "blocked", "missing": ["LLM_API_KEY", "LLM_MODEL", "SEARCH_API_KEY"]}
+}

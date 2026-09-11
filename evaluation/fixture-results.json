@@ -1,0 +1,506 @@
+{
+  "date": "2026-09-10T09:29:40.909082+00:00",
+  "mode": "fixture",
+  "provider": "none",
+  "model": "deterministic fixture planner",
+  "python": "3.12.14",
+  "limits": {
+    "steps": 16,
+    "tokens": 30000,
+    "seconds": 600,
+    "estimated_cost": 1.0
+  },
+  "rubric": {
+    "behavior": "1 if terminal status matches expected success or controlled failure",
+    "artifact_validity": "1 if all requested names exist and every generated PDF/XLSX parses",
+    "content": "1 if specified numeric first row is correct; report hypotheses and fixture labels preserved where applicable",
+    "citation_traceability": "1 if research sources have HTTP(S) URLs and exact excerpts appear in report; this does NOT measure factual support of model synthesis"
+  },
+  "status": "finished",
+  "results": [
+    {
+      "id": "research-retail",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 1.266,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 1.1880000000819564
+      },
+      "failure_category": null
+    },
+    {
+      "id": "research-supply-chains",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 1.203,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 1.1719999997876585
+      },
+      "failure_category": null
+    },
+    {
+      "id": "research-education",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 1.265,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 1.25
+      },
+      "failure_category": null
+    },
+    {
+      "id": "research-open-source",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 1.25,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 1.2350000003352761
+      },
+      "failure_category": null
+    },
+    {
+      "id": "research-energy",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 1.203,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 1.1719999997876585
+      },
+      "failure_category": null
+    },
+    {
+      "id": "research-productivity",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 1.204,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 1.203999999910593
+      },
+      "failure_category": null
+    },
+    {
+      "id": "csv-baseline",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 3.64,
+      "usage": {
+        "steps": 4,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 3.5780000002123415
+      },
+      "failure_category": null
+    },
+    {
+      "id": "csv-negatives",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 3.891,
+      "usage": {
+        "steps": 4,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 3.8590000001713634
+      },
+      "failure_category": null
+    },
+    {
+      "id": "csv-zeros",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 4.047,
+      "usage": {
+        "steps": 4,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 3.969000000040978
+      },
+      "failure_category": null
+    },
+    {
+      "id": "csv-duplicates",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 4.437,
+      "usage": {
+        "steps": 4,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 4.407000000122935
+      },
+      "failure_category": null
+    },
+    {
+      "id": "csv-missing",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 4.078,
+      "usage": {
+        "steps": 4,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 4.015999999828637
+      },
+      "failure_category": null
+    },
+    {
+      "id": "csv-unicode",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 4.375,
+      "usage": {
+        "steps": 4,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 4.32799999974668
+      },
+      "failure_category": null
+    },
+    {
+      "id": "combined-flagship",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 5.813,
+      "usage": {
+        "steps": 5,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 5.780999999959022
+      },
+      "failure_category": null
+    },
+    {
+      "id": "combined-comparison",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 3.375,
+      "usage": {
+        "steps": 5,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 3.3130000000819564
+      },
+      "failure_category": null
+    },
+    {
+      "id": "combined-experiments",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 3.484,
+      "usage": {
+        "steps": 5,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 3.4380000000819564
+      },
+      "failure_category": null
+    },
+    {
+      "id": "combined-brief",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 3.453,
+      "usage": {
+        "steps": 5,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 3.405999999959022
+      },
+      "failure_category": null
+    },
+    {
+      "id": "text-notes",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 2.219,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 2.1869999999180436
+      },
+      "failure_category": null
+    },
+    {
+      "id": "markdown-notes",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 2.219,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 2.1869999999180436
+      },
+      "failure_category": null
+    },
+    {
+      "id": "pdf-ingestion",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 2.203,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 2.1719999997876585
+      },
+      "failure_category": null
+    },
+    {
+      "id": "browser-extraction",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 1.125,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 1.0929999998770654
+      },
+      "failure_category": null
+    },
+    {
+      "id": "browser-research",
+      "status": "completed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 1.141,
+      "usage": {
+        "steps": 4,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 1.125
+      },
+      "failure_category": null
+    },
+    {
+      "id": "malformed-csv",
+      "status": "failed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 2.203,
+      "usage": {
+        "steps": 2,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 2.155999999959022
+      },
+      "failure_category": "Repeated identical action failed twice; revise the task or input before resuming"
+    },
+    {
+      "id": "missing-column",
+      "status": "failed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 3.25,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 3.235000000335276
+      },
+      "failure_category": "Repeated identical action failed twice; revise the task or input before resuming"
+    },
+    {
+      "id": "nonnumeric-csv",
+      "status": "failed",
+      "checks": {
+        "behavior": true,
+        "artifact_validity": true,
+        "content": true,
+        "citation_traceability": true
+      },
+      "score": 4,
+      "max_score": 4,
+      "seconds": 3.281,
+      "usage": {
+        "steps": 3,
+        "tokens": 0,
+        "cost": 0.0,
+        "elapsed": 3.25
+      },
+      "failure_category": "Repeated identical action failed twice; revise the task or input before resuming"
+    }
+  ],
+  "passed": 24,
+  "total": 24,
+  "expected_controlled_failures": 3,
+  "live_semantic_citation_review": "not evaluated; human source-support review required"
+}

@@ -1,0 +1,9 @@
+{
+  "date": "2026-09-11T05:59:42.741091+00:00",
+  "status": "passed",
+  "mode": "fixture on PostgreSQL/Redis/Docker",
+  "task_id": "51df47f2-2c57-4ad2-95a0-17d988883dbc",
+  "action": "SIGKILL worker during a persisted pending action, restart, await lease recovery",
+  "seconds_after_kill": 35.609,
+  "artifacts": 4
+}
