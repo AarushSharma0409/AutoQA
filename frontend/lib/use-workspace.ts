@@ -285,6 +285,30 @@ export function useWorkspace() {
     }
   }
 
+  async function followUp(message: string): Promise<boolean> {
+    if (busy || !selected || message.trim().length < 3) return false;
+    const target = selected;
+    const generation = session.current;
+    setBusy(true);
+    setError("");
+    try {
+      await api(`/tasks/${target}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ goal: message, file_ids: [] }),
+      });
+      if (generation === session.current && selection.current === target)
+        await refresh();
+      return true;
+    } catch (e) {
+      if (generation === session.current && selection.current === target)
+        setError((e as Error).message);
+      return false;
+    } finally {
+      if (generation === session.current) setBusy(false);
+    }
+  }
+
   async function download(file: StoredFile) {
     try {
       const blob = await api(`/files/${file.id}`).then((r) => r.blob());
@@ -333,6 +357,7 @@ export function useWorkspace() {
     loadSample,
     submit,
     control,
+    followUp,
     download,
     applyToken,
   };

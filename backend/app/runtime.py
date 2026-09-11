@@ -47,7 +47,13 @@ def save(task_id, lease, checkpoint, kind, payload, status=None, error=None, art
             task.lease_until = 0
         task.error = error
         for f in artifacts or []:
-            db.add(File(task_id=task_id, **f))
+            stored = File(task_id=task_id, **f)
+            db.add(stored)
+            db.flush()
+            if "current_file_ids" in checkpoint:
+                checkpoint["current_file_ids"].append(stored.id)
+        if "current_file_ids" in checkpoint:
+            task.checkpoint = deepcopy(checkpoint)
         emit(db, task, kind, **payload)
     return True
 
@@ -89,6 +95,7 @@ async def run_task(task_id):
         task = db.get(Task, task_id)
         goal, mode = task.goal, task.mode
         cp = deepcopy(task.checkpoint)
+        goal = cp.get("current_goal", goal)
         files = [{"id": f.id, "name": f.name} for f in db.scalars(select(File).where(File.task_id == task_id, File.kind == "upload"))]
     elapsed = cp.get("elapsed", 0)
     if cp.get("pending_started"):

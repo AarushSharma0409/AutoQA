@@ -1,4 +1,93 @@
 @import "tailwindcss";
+.conversation-history {
+  display: grid;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.conversation-message {
+  margin-left: auto;
+  max-width: 90%;
+  padding: 16px 20px;
+  background: #edf1e7;
+  border-radius: 16px 16px 4px 16px;
+  overflow-wrap: anywhere;
+}
+.conversation-message span {
+  color: #526044;
+  font-size: 11px;
+  font-weight: 600;
+}
+.conversation-message p {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+.previous-response {
+  margin-top: 16px;
+  border-bottom: 1px solid #deded5;
+  padding-bottom: 18px;
+}
+.previous-response summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 0;
+}
+.previous-response > p {
+  margin: 12px 0;
+  line-height: 1.6;
+}
+.conversation-composer-slot {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+}
+.result-layout > .task-rail {
+  grid-column: 2;
+  grid-row: 1 / 3;
+}
+.follow-up-composer {
+  background: #fffefb;
+  border: 1px solid #c9cec0;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+}
+.follow-up-composer label {
+  font-weight: 600;
+  font-size: 15px;
+}
+.follow-up-composer p,
+.follow-up-composer span {
+  color: #62675b;
+  font-size: 12px;
+}
+.follow-up-composer p {
+  margin: 8px 0 14px;
+}
+.follow-up-composer textarea {
+  display: block;
+  width: 100%;
+  resize: vertical;
+  min-height: 90px;
+  padding: 12px;
+  border: 1px solid #d4d8cd;
+  border-radius: 8px;
+  font: inherit;
+}
+.follow-up-composer > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+@media (max-width: 900px) {
+  .result-layout > .task-rail {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
 @media (max-width: 700px) {
   .starter-row > span {
     grid-column: 1/-1;

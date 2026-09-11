@@ -14,7 +14,11 @@ def prepare_call(goal, checkpoint, files):
     cfg = settings()
     remaining = cfg.max_tokens - checkpoint.get("tokens", 0)
     max_completion = min(1500, remaining // 2)
-    payload = json.dumps({"goal": goal, "files": files, "observations": checkpoint.get("results", [])}, ensure_ascii=False)
+    payload = json.dumps({
+        "goal": goal, "files": files, "observations": checkpoint.get("results", []),
+        "earlier_requests": [t["goal"] for t in checkpoint.get("turns", [])[-8:]],
+        "previous_work_untrusted": json.dumps(checkpoint.get("context_results", []), ensure_ascii=False)[-10000:],
+    }, ensure_ascii=False)
     # Conservative UTF-8 byte count bounds prompt tokens, plus tool schema allowance.
     schemas = [
         {

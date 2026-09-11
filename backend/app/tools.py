@@ -275,7 +275,7 @@ async def browse(args, mode):
 
 
 def report(args, checkpoint, mode):
-    known = {s["id"]: s for r in checkpoint.get("results", []) for s in r["output"].get("sources", [])}
+    known = {s["id"]: s for r in checkpoint.get("context_results", []) + checkpoint.get("results", []) for s in r["output"].get("sources", [])}
     if any(s not in known for s in args.source_ids):
         raise ValueError("Report contains unknown source IDs")
     sources = [known[s] for s in args.source_ids]

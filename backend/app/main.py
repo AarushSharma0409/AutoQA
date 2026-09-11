@@ -79,7 +79,10 @@ def task_json(task, detailed=False):
             usage={k: cp.get(k, 0) for k in ["steps", "tokens", "cost", "elapsed"]},
             accounting_note=cp.get("accounting_note"),
             approval=cp.get("approval"),
-            sources=[s for r in cp.get("results", []) for s in r["output"].get("sources", [])],
+            sources=list({s["id"]: s for r in cp.get("context_results", []) + cp.get("results", []) for s in r["output"].get("sources", [])}.values()),
+            turns=cp.get("turns", []),
+            current_goal=cp.get("current_goal", task.goal),
+            current_file_ids=cp.get("current_file_ids"),
         )
     return data
 
@@ -175,7 +178,7 @@ async def create_task(body: CreateTask, owner=Depends(identity)):
 def history(owner=Depends(identity)):
     with Session() as db:
         count = select(func.count(File.id)).where(File.task_id == Task.id, File.kind == "artifact").correlate(Task).scalar_subquery()
-        rows = db.execute(select(Task, count).where(Task.owner == owner, Task.status != "staging").order_by(Task.created.desc()).limit(100))
+        rows = db.execute(select(Task, count).where(Task.owner == owner, Task.status != "staging").order_by(Task.updated.desc()).limit(100))
         return [{**task_json(task), "artifact_count": artifact_count} for task, artifact_count in rows]
 
 
@@ -184,6 +187,47 @@ def detail(task_id: str, owner=Depends(identity)):
     with Session() as db:
         task = owned(db, task_id, owner)
         return {**task_json(task, True), "files": [file_json(f) for f in db.scalars(select(File).where(File.task_id == task_id))]}
+
+
+@app.post("/api/tasks/{task_id}/messages")
+async def follow_up(task_id: str, body: CreateTask, owner=Depends(identity)):
+    if len(body.goal.strip()) < 3:
+        raise HTTPException(422, "Write a follow-up with at least three characters")
+    with Session.begin() as db:
+        task = db.scalar(select(Task).where(Task.id == task_id).with_for_update())
+        if not task or task.owner != owner:
+            raise HTTPException(404, "Task not found")
+        if task.status not in {"completed", "failed", "canceled"}:
+            raise HTTPException(409, "Wait for this turn to finish or cancel it before sending a follow-up")
+        cp = task.checkpoint
+        existing = list(db.scalars(select(File).where(File.task_id == task_id)))
+        archived_ids = {i for turn in cp.get("turns", []) for i in turn["file_ids"]}
+        turns = cp.get("turns", []) + [{
+            "goal": cp.get("current_goal", task.goal), "status": task.status,
+            "error": task.error, "created": task.updated,
+            "summary": next((r["output"].get("summary", "") for r in reversed(cp.get("results", [])) if r["tool"] == "finish"), ""),
+            "file_ids": [f.id for f in existing if f.kind == "artifact" and f.id not in archived_ids],
+            "usage": {k: cp.get(k, 0) for k in ["steps", "tokens", "cost", "elapsed"]},
+        }]
+        if len(turns) > 100:
+            raise HTTPException(409, "Conversation has reached 100 turns; start a new task")
+        if sum(f.kind == "upload" for f in existing) + len(set(body.file_ids)) > 10:
+            raise HTTPException(422, "Attach up to 10 documents per conversation")
+        for file_id in sorted(set(body.file_ids)):
+            f = db.scalar(select(File).where(File.id == file_id).with_for_update())
+            if not f or owned(db, f.task_id, owner).status != "staging":
+                raise HTTPException(422, "Upload is missing or already attached")
+            staging = db.get(Task, f.task_id)
+            f.task_id = task.id
+            db.delete(staging)
+        task.checkpoint = {
+            "turns": turns, "current_goal": body.goal.strip(), "current_file_ids": [],
+            "context_results": (cp.get("context_results", []) + cp.get("results", []))[-40:],
+        }
+        task.status, task.error, task.lease, task.lease_until = "queued", None, None, 0
+        emit(db, task, "message", summary=body.goal.strip(), status="queued")
+    await notify(task_id)
+    return {"status": "queued"}
 
 
 @app.get("/api/tasks/{task_id}/events")

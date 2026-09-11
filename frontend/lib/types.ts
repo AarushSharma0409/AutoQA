@@ -23,6 +23,16 @@ export type Task = {
   files?: StoredFile[];
   sources?: Source[];
   artifact_count?: number;
+  current_goal?: string;
+  current_file_ids?: string[] | null;
+  turns?: {
+    goal: string;
+    status: string;
+    summary: string;
+    error?: string;
+    file_ids: string[];
+    created: number;
+  }[];
   accounting_note?: string;
   usage?: { steps: number; tokens: number; cost: number; elapsed: number };
   approval?: {

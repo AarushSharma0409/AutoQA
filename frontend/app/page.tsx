@@ -42,6 +42,10 @@ import {
   taskLabel,
 } from "../lib/types";
 import { ChartView, FileViewer, ReportView } from "../components/report-view";
+import {
+  ConversationHistory,
+  FollowUpComposer,
+} from "../components/conversation";
 
 const starters = [
   {
@@ -220,15 +224,17 @@ export default function Workspace() {
   const artifacts = w.task?.files?.filter((f) => f.kind === "artifact") || [];
   const inputs = w.task?.files?.filter((f) => f.kind === "upload") || [];
   const sources = w.task?.sources || [];
-  const report = artifacts.find((f) => f.mime === "text/markdown");
-  const pdf = artifacts.find((f) => f.mime === "application/pdf");
-  const charts = artifacts.filter((f) => f.mime.startsWith("image/"));
-  const recent = w.tasks
-    .filter(
-      (task, index, all) =>
-        all.findIndex((t) => t.goal === task.goal) === index,
-    )
-    .slice(0, 5);
+  const currentArtifacts = artifacts.filter(
+    (f) => !w.task?.current_file_ids || w.task.current_file_ids.includes(f.id),
+  );
+  const report = [...currentArtifacts]
+    .reverse()
+    .find((f) => f.mime === "text/markdown");
+  const pdf = [...currentArtifacts]
+    .reverse()
+    .find((f) => f.mime === "application/pdf");
+  const charts = currentArtifacts.filter((f) => f.mime.startsWith("image/"));
+  const recent = w.tasks.slice(0, 20);
   const pending = w.tasks.filter((task) => activeStates.includes(task.status));
   const displayedTasks = (view === "history" ? w.tasks : recent).filter(
     (task) =>
@@ -238,7 +244,8 @@ export default function Workspace() {
           ? activeStates.includes(task.status)
           : task.status === statusFilter)),
   );
-  const finishedSummary = [...w.events]
+  const lastMessage = w.events.findLastIndex((e) => e.kind === "message");
+  const finishedSummary = [...w.events.slice(lastMessage + 1)]
     .reverse()
     .find((e) => e.payload.tool === "finish" && e.kind === "result")?.payload
     .output?.summary;
@@ -904,6 +911,13 @@ export default function Workspace() {
                 {tab === "overview" && (
                   <div className="result-layout">
                     <div className="result-main">
+                      {w.task && (
+                        <ConversationHistory
+                          task={w.task}
+                          api={w.api}
+                          download={w.download}
+                        />
+                      )}
                       {!!charts.length && (
                         <section className="result-card">
                           <header>
@@ -982,6 +996,16 @@ export default function Workspace() {
                         </section>
                       )}
                     </div>
+                    {w.task && (
+                      <div className="conversation-composer-slot">
+                        <FollowUpComposer
+                          key={w.task.id}
+                          task={w.task}
+                          busy={w.busy}
+                          send={w.followUp}
+                        />
+                      </div>
+                    )}
                     <aside className="task-rail">
                       <section className="execution-panel">
                         <div className="rail-heading">
