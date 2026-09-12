@@ -7,6 +7,9 @@ __pycache__/
 *.pyc
 *.tsbuildinfo
 .env
+.env.*
+!.env.example
+backups/
 data/
 test-results/
 playwright-report/

@@ -1,6 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,6 +32,11 @@ class Settings(BaseSettings):
     max_tool_bytes: int = 24000
     lease_seconds: int = 30
     allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    rate_limit_reads: int = Field(default=600, ge=1)
+    rate_limit_writes: int = Field(default=30, ge=1)
+    rate_limit_window: int = Field(default=60, ge=1)
+    db_pool_size: int = Field(default=4, ge=1, le=32)
+    db_max_overflow: int = Field(default=4, ge=0, le=32)
 
     def validate_runtime(self):
         if self.mode not in {"demo", "live"}:

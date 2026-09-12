@@ -32,11 +32,11 @@ class TextExtractor(HTMLParser):
         self.hidden = 0
 
     def handle_starttag(self, tag, attrs):
-        if tag in {"script", "style"}:
+        if tag in {"script", "style", "nav", "header", "footer", "noscript"}:
             self.hidden += 1
 
     def handle_endtag(self, tag):
-        if tag in {"script", "style"}:
+        if tag in {"script", "style", "nav", "header", "footer", "noscript"}:
             self.hidden = max(0, self.hidden - 1)
 
     def handle_data(self, data):
@@ -279,6 +279,22 @@ def report(args, checkpoint, mode):
     if any(s not in known for s in args.source_ids):
         raise ValueError("Report contains unknown source IDs")
     sources = [known[s] for s in args.source_ids]
+    if mode == "live" and known:
+        if not sources:
+            raise ValueError("Research report needs source_ids for the evidence used and inline [source-id] citations in findings")
+        if any(f"[{s['id']}]" not in args.findings for s in sources):
+            raise ValueError("Cite each selected source inline in findings as [source-id]; use only IDs supporting those claims")
+        for paragraph in args.findings.splitlines():
+            cited = [s for s in sources if f"[{s['id']}]" in paragraph]
+            if not cited:
+                continue
+            claim = paragraph
+            for source in cited:
+                claim = claim.replace(f"[{source['id']}]", "")
+            figures = set(re.findall(r"(?<![\w])\d+(?:[.,]\d+)*(?:%)?", claim))
+            evidence = " ".join(s["excerpt"] for s in cited)
+            if any(figure not in evidence for figure in figures):
+                raise ValueError("A cited claim contains numbers absent from its source excerpt. Remove unsupported figures or retrieve supporting evidence.")
     label = "DEMO · fixture-backed workflow" if mode == "demo" else "LIVE · model-generated synthesis; verify interpretations"
     markdown = f"# {args.title}\n\n{label}\n\n## Findings\n{args.findings}\n\n## Hypotheses and suggested experiments\n{args.hypotheses}\n"
     styles = getSampleStyleSheet()

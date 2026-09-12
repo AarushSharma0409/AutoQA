@@ -1,0 +1,14 @@
+{
+  "date": "2026-09-11",
+  "backend_postgresql_docker": {"passed": 54, "skipped": 0, "evidence": "security-scaling-tests.xml"},
+  "browser_desktop_mobile": {"passed": 10, "environment": "isolated Compose demo stack, port 3100"},
+  "dependency_advisories": {"frontend_production": 0, "backend_pinned_requirements": 0, "scope": "npm audit --omit=dev and pip-audit pinned requirements; not an image or penetration audit"},
+  "load": {"api_replicas": 2, "workers": 2, "requests": 120, "concurrency": 12, "seconds": 0.356, "p95_ms": 73.42, "environment": "local Docker, authenticated configuration reads"},
+  "distributed_write_quota": {"allowed_missing_task_requests": 30, "blocked_429": 3, "retry_after_verified": true},
+  "fixture_worker_dispatch": {"tasks_completed": 6, "duplicate_completions": 0, "artifacts_downloaded": 12},
+  "api_failover": {"replicas_stopped": 1, "successful_health_requests": 30, "total_health_requests": 30, "replica_restored": true},
+  "database": {"engine": "PostgreSQL 17", "database": "autoagent", "volume": "autoqa_postgres", "container_mount": "/var/lib/postgresql/data", "migration_versions": [1, 2]},
+  "artifact_volume": {"name": "autoqa_artifacts", "container_mount": "/app/data"},
+  "live_acceptance": {"status": "failed", "reason": "Task token budget exhausted", "evidence": "live-security-smoke.json"},
+  "limitations": ["Single-host scaling only", "No tested off-host restore", "Development database credentials/role", "Public identity and TLS not deployed", "Live model factual support is not guaranteed"]
+}

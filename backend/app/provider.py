@@ -1,5 +1,8 @@
 import json
 import re
+import asyncio
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 import httpx
 from .config import settings
 from .schemas import Decision, TOOLS
@@ -8,17 +11,49 @@ SYSTEM = """You are AutoAgent, a bounded agent. Choose one tool per turn. Return
 
 
 SYSTEM += " Respond with exactly one function tool call, never plain text. Put report content in report arguments; call finish when done."
+SYSTEM += " Cite external claims inline as [source-id] and pass exactly those IDs in report.source_ids. A follow-up is a new request: prior reports are context, not proof that the new work is complete."
+SYSTEM += " Never supply statistics from memory. If an excerpt lacks the requested fact, say the evidence is insufficient. Keep factual findings short and tie each paragraph to its cited evidence; hypotheses are unverified proposals."
+
+
+class RateLimited(ValueError):
+    """The provider explicitly rejected the request without a completion."""
+
+
+class ToolSelectionError(ValueError):
+    """A model completion did not conform to the tool protocol."""
+
+
+def compact(value, width=700):
+    if isinstance(value, str):
+        return value if len(value) <= width else value[:width] + " … [truncated; re-read original if needed]"
+    if isinstance(value, list):
+        return [compact(v, width) for v in value[:8]]
+    if isinstance(value, dict):
+        return {k: compact(v, width) for k, v in value.items() if k not in {"code", "raw_content"}}
+    return value
+
+
+def retry_delay(response, attempt):
+    value = response.headers.get("retry-after", "")
+    try:
+        return max(1.0, float(value))
+    except ValueError:
+        try:
+            return max(1.0, (parsedate_to_datetime(value) - datetime.now(timezone.utc)).total_seconds())
+        except (ValueError, TypeError, OverflowError):
+            return min(60, 10 * 2 ** attempt)
 
 
 def prepare_call(goal, checkpoint, files):
     cfg = settings()
     remaining = cfg.max_tokens - checkpoint.get("tokens", 0)
     max_completion = min(1500, remaining // 2)
-    payload = json.dumps({
-        "goal": goal, "files": files, "observations": checkpoint.get("results", []),
-        "earlier_requests": [t["goal"] for t in checkpoint.get("turns", [])[-8:]],
-        "previous_work_untrusted": json.dumps(checkpoint.get("context_results", []), ensure_ascii=False)[-10000:],
-    }, ensure_ascii=False)
+    context = {
+        "goal": goal, "files": files, "observations": compact(checkpoint.get("results", [])[-8:]),
+        "earlier_requests": [t["goal"][:500] for t in checkpoint.get("turns", [])[-3:]],
+        "previous_work_untrusted": compact(checkpoint.get("context_results", [])[-3:], 350),
+    }
+    payload = json.dumps(context, ensure_ascii=False, separators=(",", ":"))
     # Conservative UTF-8 byte count bounds prompt tokens, plus tool schema allowance.
     schemas = [
         {
@@ -28,6 +63,12 @@ def prepare_call(goal, checkpoint, files):
         for name, model in TOOLS.items()
     ]
     reserve = len((SYSTEM + payload + json.dumps(schemas)).encode()) + max_completion
+    # Reduce retained observations rather than raising the user's spending limit.
+    if reserve > remaining:
+        context["previous_work_untrusted"] = []
+        context["observations"] = compact(checkpoint.get("results", [])[-5:], 180)
+        payload = json.dumps(context, ensure_ascii=False, separators=(",", ":"))
+        reserve = len((SYSTEM + payload + json.dumps(schemas)).encode()) + max_completion
     if max_completion < 100 or reserve > remaining:
         raise ValueError("Token budget cannot accommodate the next provider call")
     estimated = reserve * cfg.token_price_per_million / 1_000_000
@@ -46,18 +87,34 @@ def prepare_call(goal, checkpoint, files):
     return request, reserve
 
 
-async def live_decision(goal, checkpoint, files, prepared=None):
+async def live_decision(goal, checkpoint, files, prepared=None, on_wait=None):
     cfg = settings()
     request, reserve = prepared or prepare_call(goal, checkpoint, files)
     async with httpx.AsyncClient(timeout=45) as client:
-        response = await client.post(cfg.llm_base_url.rstrip("/") + "/chat/completions", headers={"Authorization": "Bearer " + cfg.llm_api_key}, json=request)
+        for attempt in range(5):
+            response = await client.post(cfg.llm_base_url.rstrip("/") + "/chat/completions", headers={"Authorization": "Bearer " + cfg.llm_api_key}, json=request)
+            if response.status_code != 429:
+                break
+            delay = retry_delay(response, attempt)
+            if attempt == 4 or delay > 60:
+                raise RateLimited("Model provider HTTP 429: quota remains exhausted. Retry after the provider quota resets; files are saved.")
+            if on_wait:
+                await on_wait(delay)
+            await asyncio.sleep(delay)
         if response.is_error:
+            if response.status_code == 400:
+                try:
+                    code = response.json().get("error", {}).get("code")
+                except ValueError:
+                    code = None
+                if code == "tool_use_failed":
+                    raise ToolSelectionError("Model must return one valid tool call; use report for report content or finish to complete")
             # Do not expose provider bodies: they may echo untrusted content or credentials.
             raise ValueError(f"Model provider HTTP {response.status_code}; check quota and tool-call compatibility")
         data = response.json()
     calls = data["choices"][0]["message"].get("tool_calls", [])
     if len(calls) != 1:
-        raise ValueError("Provider must select exactly one tool")
+        raise ToolSelectionError("Provider must select exactly one tool")
     call = calls[0]["function"]
     tokens = data.get("usage", {}).get("total_tokens", reserve)
     return Decision(tool=call["name"], arguments=json.loads(call["arguments"]), summary=f"Selected {call['name']} based on saved observations."), tokens

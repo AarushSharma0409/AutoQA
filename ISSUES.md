@@ -1,5 +1,11 @@
 # Findings and limitations
 
+## Security and scaling audit — 2026-09-11
+
+Nginx now load-balances internal API replicas, Redis enforces shared per-account request limits, DB pools are bounded, PostgreSQL migrations are serialized, and SSE releases DB connections before streaming. Verified 54 PostgreSQL/Docker tests, 10 browser tests, two-replica shared quotas, six fixture jobs without duplicate completion, and API failover. See OPERATIONS.md and evaluation/security-scaling-summary.json.
+
+Live acceptance remains open: the latest audit task generated a valid report repeatedly instead of selecting finish, then exhausted its token budget (evaluation/live-security-smoke.json). Citation-format and numeric-presence checks do not prove semantic source support. Production blockers include development DB credentials/admin role, public authentication/TLS, off-host backup/restore, storage/admission quotas and multi-host infrastructure. No claim of full production security or successful live acceptance is made.
+
 ## Latest live verification — 2026-09-11
 
 Model credentials are configured and Tavily keyless REST search is verified in Docker. The live 24-case benchmark ran with Groq openai/gpt-oss-20b: two research tasks completed, one passed all checks, and 22 cases stopped on provider HTTP 429. The education report failed citation traceability. Provider failures are no longer counted as expected invalid-input passes. See evaluation/live-results.json. Next: rerun with pacing matched to provider quota, investigate citation selection, and review factual support. The earlier missing-credentials notes below are historical and superseded.

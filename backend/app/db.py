@@ -46,7 +46,8 @@ class File(Base):
 
 
 def make_engine(url):
-    engine = create_engine(url, connect_args={"check_same_thread": False, "timeout": 30} if url.startswith("sqlite") else {}, pool_pre_ping=True)
+    pool = {} if url.startswith("sqlite") else {"pool_size": settings().db_pool_size, "max_overflow": settings().db_max_overflow, "pool_timeout": 10}
+    engine = create_engine(url, connect_args={"check_same_thread": False, "timeout": 30} if url.startswith("sqlite") else {}, pool_pre_ping=True, **pool)
     if url.startswith("sqlite"):
 
         @event.listens_for(engine, "connect")
@@ -72,10 +73,17 @@ def migrate():
     from sqlalchemy import text
 
     with engine.begin() as conn:
+        if conn.dialect.name == "postgresql":
+            conn.execute(text("SELECT pg_advisory_xact_lock(71428391)"))
         conn.execute(text("CREATE TABLE IF NOT EXISTS schema_version (version INTEGER PRIMARY KEY)"))
         if not conn.execute(text("SELECT version FROM schema_version WHERE version=1")).first():
             Base.metadata.create_all(conn)
             conn.execute(text("INSERT INTO schema_version(version) VALUES (1)"))
+        if not conn.execute(text("SELECT version FROM schema_version WHERE version=2")).first():
+            conn.execute(text("CREATE INDEX IF NOT EXISTS ix_tasks_dispatch ON tasks (status, lease_until, created)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS ix_tasks_history ON tasks (owner, updated)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS ix_events_cursor ON events (task_id, id)"))
+            conn.execute(text("INSERT INTO schema_version(version) VALUES (2)"))
 
 
 if __name__ == "__main__":

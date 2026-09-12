@@ -7,7 +7,7 @@ from copy import deepcopy
 from sqlalchemy import or_, select, update
 from .config import settings
 from .db import File, Session, Task, emit
-from .provider import demo_decision, live_decision, prepare_call
+from .provider import RateLimited, ToolSelectionError, demo_decision, live_decision, prepare_call
 from .schemas import Decision, TOOLS
 from .tools import execute
 
@@ -147,7 +147,20 @@ async def run_task(task_id):
                     cp["pending_started"] = time.time()
                     if not save(task_id, lease, cp, "provider", {"summary": "Provider call budget reserved before dispatch."}):
                         return
-                    decision, tokens = await guard(task_id, lease, started, elapsed, live_decision(goal, cp, files, prepared=prepared))
+                    async def on_wait(delay):
+                        save(task_id, lease, cp, "provider", {"summary": f"Provider rate limit reached. Waiting {delay:.0f}s before retrying; you can still cancel."})
+                    try:
+                        decision, tokens = await guard(task_id, lease, started, elapsed, live_decision(goal, cp, files, prepared=prepared, on_wait=on_wait))
+                    except ToolSelectionError:
+                        # Unknown provider usage stays charged at the reserved upper bound.
+                        cp.pop("provider_reservation", None)
+                        cp.pop("pending_started", None)
+                        cp["format_failures"] = cp.get("format_failures", 0) + 1
+                        if cp["format_failures"] > 2:
+                            raise
+                        cp["results"].append({"tool": "provider_feedback", "output": {"error": "Return exactly one valid function call. Put prose in report arguments, or call finish if all requested work is complete."}})
+                        save(task_id, lease, cp, "provider", {"summary": "Model returned an invalid tool call. Retrying within the remaining budget."})
+                        continue
                     cp["tokens"] -= cp.pop("provider_reservation")
                     cp["cost"] -= reserve * cfg.token_price_per_million / 1_000_000
                     cp.pop("pending_started", None)
@@ -245,6 +258,10 @@ async def run_task(task_id):
         # Cancellation state is persisted by the API; a dead worker loses its lease.
         return
     except Exception as exc:
+        if isinstance(exc, RateLimited):
+            reserved = cp.pop("provider_reservation", 0)
+            cp["tokens"] -= reserved
+            cp["cost"] -= reserved * settings().token_price_per_million / 1_000_000
         message = (
             str(exc)[:500]
             if isinstance(exc, (ValueError, TimeoutError))

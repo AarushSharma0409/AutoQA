@@ -28,6 +28,7 @@ temp = Path(tempfile.mkdtemp(prefix="autoagent-eval-"))
 os.environ["DATABASE_URL"] = "sqlite:///" + (temp / "eval.db").as_posix()
 os.environ["STORAGE_ROOT"] = str(temp / "files")
 os.environ["REDIS_URL"] = ""
+os.environ["RATE_LIMIT_WRITES"] = "1000"  # Isolated benchmark client; production quotas remain unchanged.
 os.environ["MODE"] = "live" if args.live else "demo"
 
 from fastapi.testclient import TestClient  # noqa: E402
@@ -201,10 +202,12 @@ with TestClient(app) as client:
                         content_ok &= "DEMO" in markdown
             except Exception:
                 validity = False
+        # A report need not cite every search hit. Check the sources it actually uses.
+        cited_sources = [s for s in task["sources"] if f"[{s['id']}]" in markdown]
         citations = (
             not case.get("sources")
-            or bool(task["sources"])
-            and all(s["url"].startswith(("http://", "https://")) and s["excerpt"] in markdown for s in task["sources"])
+            or bool(cited_sources)
+            and all(s["url"].startswith(("http://", "https://")) and s["excerpt"] in markdown for s in cited_sources)
         )
         checks = {
             "behavior": task["status"] == case["status"] and not (task.get("error") or "").startswith("Model provider HTTP"),

@@ -2,9 +2,11 @@
 
 A general-purpose agent workspace with observable tool execution, persisted progress, source excerpts, and downloadable artifacts. Next.js/TypeScript frontend; FastAPI/SQLAlchemy backend; PostgreSQL task state; Redis worker notifications; Playwright public-page extraction; Docker-isolated Python.
 
-**Status: implemented and locally verified in fixture mode; Docker/PostgreSQL/Redis and kernel isolation are verified; full acceptance awaits live provider credentials.** Consult `ACCEPTANCE.md` for evidence rather than treating the presence of source code as proof of a working integration.
+**Status: PostgreSQL/Docker isolation, shared request limiting, local API failover and browser flows are verified. Live model reliability still needs improvement: the latest research smoke test exhausted its task budget.** Consult `OPERATIONS.md` and `evaluation/security-scaling-tests.xml` for the deployment boundary and test evidence.
 
 ## Workspace
+
+Saved tasks support ongoing conversations. Open a task, use **Continue this conversation**, and send a follow-up to revise a report or analyze the same documents again. Previous messages and report downloads stay in that task; active conversations move to the top of history. Wait for the current run or cancel it before sending another message. Each new message gets a fresh execution budget and new Python approvals. Earlier outputs provide bounded model context, while original uploads remain available for reanalysis. Existing demo conversations remain demo conversations.
 
 The redesigned task desk includes a sample CSV loader, searchable history with real file counts, inline Markdown reports and charts, authenticated file previews/downloads, execution and source tabs, and a keyboard-accessible settings dialog. Saved tasks reopen directly from their URL. Mobile uses a navigation drawer; session changes clear stale task state. Automated accessibility checks cover the workspace, report and settings views on desktop and mobile.
 
@@ -14,12 +16,14 @@ For a local production frontend, run `npm run build` then `npm start` from `fron
 
 Prerequisites: Docker Engine/Desktop with Linux containers, Docker Compose v2, outbound access to image/package registries. Run from the repository root:
 
-```sh
-cp .env.example .env
-docker compose up --build
+```powershell
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+docker compose --profile live up --build -d --scale api=2 --scale worker=2
 ```
 
 Open <http://localhost:3000>. Compose binds the API and web UI to loopback. The migration service runs before API/worker startup. PostgreSQL and artifact volumes preserve history across restarts. Do not use `docker compose down -v` if you want to keep your data.
+
+Nginx now owns the public ports and balances internal API replicas. See [OPERATIONS.md](OPERATIONS.md) for database location, account request limits, replica sizing and requirements before public deployment.
 
 On PowerShell, use `Copy-Item .env.example .env` instead of `cp` if preferred. Docker Desktop 4.84.0 / Engine 29.6.2 / Compose v5.3.1 fresh build and startup passed on 2026-09-11. Create `.env` only on first setup; preserve existing credentials.
 

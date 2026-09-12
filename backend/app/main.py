@@ -10,13 +10,18 @@ from .config import settings
 from .db import Event, File, Session, Task, emit, migrate
 from .schemas import Approval, CreateTask
 from .storage import storage
+from .rate_limit import RequestLimiter
 
 
 @asynccontextmanager
 async def lifespan(app):
     settings().validate_runtime()
     migrate()
-    yield
+    app.state.limiter = RequestLimiter(settings().redis_url)
+    try:
+        yield
+    finally:
+        await app.state.limiter.close()
 
 
 app = FastAPI(title="AutoAgent", lifespan=lifespan)
@@ -105,6 +110,18 @@ def health():
     with Session() as db:
         db.execute(select(1))
     return {"status": "ok", "mode": settings().mode}
+
+
+async def request_quota(request: Request, owner=Depends(identity)):
+    # Cancellation remains available during overload or a quota-store outage.
+    if request.url.path.endswith("/cancel"):
+        return
+    cfg = settings()
+    writes = request.method not in {"GET", "HEAD", "OPTIONS"}
+    await request.app.state.limiter.check(owner, "writes" if writes else "reads", cfg.rate_limit_writes if writes else cfg.rate_limit_reads, cfg.rate_limit_window)
+
+
+app.router.dependencies.append(Depends(request_quota))
 
 
 @app.get("/api/config")
@@ -248,9 +265,11 @@ async def events(task_id: str, request: Request, after: int = 0, owner=Depends(i
                 task = owned(db, task_id, owner)
                 rows = list(db.scalars(select(Event).where(Event.task_id == task_id, Event.id > cursor).order_by(Event.id).limit(100)))
                 terminal = task.status in {"completed", "failed", "canceled", "awaiting_approval"}
-                for row in rows:
-                    cursor = row.id
-                    yield f"id: {row.id}\ndata: {json.dumps({'id': row.id, 'kind': row.kind, 'payload': row.payload, 'created': row.created})}\n\n"
+                frames = [(row.id, f"id: {row.id}\ndata: {json.dumps({'id': row.id, 'kind': row.kind, 'payload': row.payload, 'created': row.created})}\n\n") for row in rows]
+            # Release the database connection before waiting on a slow streaming client.
+            for event_id, frame in frames:
+                cursor = event_id
+                yield frame
             if terminal and len(rows) < 100:
                 break
             yield ": heartbeat\n\n"

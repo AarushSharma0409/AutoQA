@@ -1,0 +1,25 @@
+# Isolated browser-test deployment; separate project name gives separate DB/storage volumes.
+x-test-env: &test-env
+  MODE: demo
+  DATABASE_URL: postgresql+psycopg://autoagent:autoagent@postgres:5432/autoagent
+  REDIS_URL: redis://redis:6379/0
+  STORAGE_ROOT: /app/data/files
+  ALLOWED_ORIGINS: http://127.0.0.1:3100,http://localhost:3100
+  RATE_LIMIT_WRITES: "1000"
+services:
+  migrate:
+    image: autoqa-migrate
+    env_file: !reset []
+    environment: *test-env
+  api:
+    image: autoqa-api
+    env_file: !reset []
+    environment: *test-env
+  worker:
+    image: autoqa-worker
+    env_file: !reset []
+    environment: *test-env
+  web:
+    image: autoqa-web
+  gateway:
+    ports: !override ["127.0.0.1:3100:8080", "127.0.0.1:8100:8081"]
