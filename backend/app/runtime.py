@@ -167,6 +167,18 @@ async def run_task(task_id):
                 cp["tokens"] += tokens
                 cp["cost"] += tokens * cfg.token_price_per_million / 1_000_000
             # Schema validation precedes approval and execution.
+            if decision.tool == "report" and any(
+                r["tool"] == "report" and "error" not in r["output"]
+                for r in cp["results"]
+            ):
+                # Results belong to this request only; earlier turns are in
+                # context_results. Reuse the committed report after recovery too.
+                # The normal finish checks below still enforce required work.
+                decision = Decision(
+                    tool="finish",
+                    arguments={"summary": "The report is ready. Use a follow-up message to request revisions."},
+                    summary="Reuse the saved report and check completion requirements.",
+                )
             TOOLS[decision.tool].model_validate(decision.arguments)
             action_hash = digest(decision)
             if cp["failures"].get(action_hash, 0) >= 2:

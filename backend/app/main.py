@@ -11,6 +11,7 @@ from .db import Event, File, Session, Task, emit, migrate
 from .schemas import Approval, CreateTask
 from .storage import storage
 from .rate_limit import RequestLimiter
+from .auth import supabase_identity
 
 
 @asynccontextmanager
@@ -46,6 +47,10 @@ async def ingress_limits(request, call_next):
 
 
 def identity(authorization: str | None = Header(default=None)):
+    if settings().auth_provider == "supabase":
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(401, "Please sign in")
+        return supabase_identity(authorization[7:], settings().supabase_url)
     if settings().mode == "demo":
         return "local-demo"
     try:
@@ -110,6 +115,16 @@ def health():
     with Session() as db:
         db.execute(select(1))
     return {"status": "ok", "mode": settings().mode}
+
+
+@app.get("/api/auth/config")
+def auth_config():
+    cfg = settings()
+    return JSONResponse({
+        "provider": cfg.auth_provider,
+        "url": cfg.supabase_url if cfg.auth_provider == "supabase" else "",
+        "publishableKey": cfg.supabase_publishable_key if cfg.auth_provider == "supabase" else "",
+    }, headers={"Cache-Control": "no-store"})
 
 
 async def request_quota(request: Request, owner=Depends(identity)):
@@ -339,3 +354,28 @@ def download(file_id: str, owner=Depends(identity)):
             filename=f.name,
             headers={"X-Content-Type-Options": "nosniff", "Content-Security-Policy": "sandbox; default-src 'none'", "Cache-Control": "private, no-store"},
         )
+
+
+@app.delete("/api/files/{file_id}")
+def delete_file(file_id: str, owner=Depends(identity)):
+    with Session.begin() as db:
+        f = db.get(File, file_id)
+        if not f:
+            raise HTTPException(404, "File not found")
+        task = db.scalar(select(Task).where(Task.id == f.task_id).with_for_update())
+        if not task or task.owner != owner:
+            raise HTTPException(404, "File not found")
+        if f.kind != "artifact":
+            raise HTTPException(409, "Only generated files can be deleted")
+        if task.status not in {"completed", "failed", "canceled"}:
+            raise HTTPException(409, "Wait for the task to finish or cancel it before deleting files")
+        cp = dict(task.checkpoint)
+        if "current_file_ids" in cp:
+            cp["current_file_ids"] = [i for i in cp["current_file_ids"] or [] if i != file_id]
+        cp["turns"] = [{**turn, "file_ids": [i for i in turn.get("file_ids", []) if i != file_id]} for turn in cp.get("turns", [])]
+        task.checkpoint = cp
+        # Validated UUID storage keys cannot escape the configured storage root.
+        storage.path(f.storage_key).unlink(missing_ok=True)
+        db.delete(f)
+        emit(db, task, "file_deleted", file_id=file_id, summary="Generated file deleted")
+    return {"deleted": file_id}

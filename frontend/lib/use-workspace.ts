@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Config, RunEvent, StoredFile, Task, terminalStates } from "./types";
 
-export function useWorkspace() {
+export function useWorkspace(getAccessToken?: () => Promise<string>) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [task, setTask] = useState<Task | null>(null);
@@ -26,7 +26,8 @@ export function useWorkspace() {
   const api = useCallback(
     async (path: string, init: RequestInit = {}) => {
       const headers = new Headers(init.headers);
-      if (token) headers.set("Authorization", `Bearer ${token}`);
+      const accessToken = getAccessToken ? await getAccessToken() : token;
+      if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
       const response = await fetch("/api" + path, {
         ...init,
         headers,
@@ -46,7 +47,7 @@ export function useWorkspace() {
       }
       return response;
     },
-    [token],
+    [token, getAccessToken],
   );
 
   const refresh = useCallback(
@@ -334,6 +335,21 @@ export function useWorkspace() {
     choose(null);
   }
 
+  async function deleteFile(file: StoredFile) {
+    if (busy || !window.confirm(`Permanently delete ${file.name}? This cannot be undone. Other files and your conversation will remain.`)) return;
+    const generation = session.current;
+    setBusy(true);
+    setError("");
+    try {
+      await api(`/files/${file.id}`, { method: "DELETE" });
+      if (generation === session.current) await refresh();
+    } catch (error) {
+      if (generation === session.current) setError((error as Error).message);
+    } finally {
+      if (generation === session.current) setBusy(false);
+    }
+  }
+
   return {
     tasks,
     selected,
@@ -359,6 +375,7 @@ export function useWorkspace() {
     control,
     followUp,
     download,
+    deleteFile,
     applyToken,
   };
 }

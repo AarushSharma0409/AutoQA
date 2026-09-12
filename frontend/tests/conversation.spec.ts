@@ -40,6 +40,7 @@ test("follow-up stays in the saved conversation and preserves earlier reports", 
   });
   await page.route("**/api/**", async (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path === "/api/auth/config") return route.fulfill({ json: { provider: "local" } });
     if (path.endsWith("/messages")) {
       expect(route.request().postDataJSON().goal).toBe(
         "Show more detail using the same document",

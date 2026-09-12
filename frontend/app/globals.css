@@ -1,4 +1,162 @@
 @import "tailwindcss";
+.account-page {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #fffefb;
+  color: #293129;
+}
+.account-story {
+  background: #e9edde;
+  padding: clamp(32px, 5vw, 88px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 70px;
+}
+.account-brand {
+  font-size: 25px;
+  font-weight: 700;
+  text-decoration: none;
+  color: inherit;
+}
+.account-brand span {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  margin-top: 5px;
+  font-weight: 500;
+}
+.account-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  margin-bottom: 22px;
+}
+.account-story h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(36px, 4vw, 64px);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+.account-story h1 + p {
+  max-width: 410px;
+  color: #515b49;
+  line-height: 1.85;
+  margin-top: 28px;
+  font-size: 15px;
+}
+.account-caption {
+  font-size: 12px;
+  color: #56634c;
+}
+.account-panel {
+  display: grid;
+  place-items: center;
+  padding: 48px 28px;
+}
+.account-form {
+  width: 100%;
+  max-width: 370px;
+}
+.account-form h2 {
+  font-family: Georgia, serif;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+.account-description {
+  color: #687062;
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 18px 0 30px;
+}
+.account-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 20px 0;
+}
+.account-form input {
+  display: block;
+  width: 100%;
+  margin-top: 9px;
+  padding: 12px;
+  border: 1px solid #b9c2b0;
+  border-radius: 6px;
+  font: inherit;
+  background: white;
+}
+.account-form input:focus-visible,
+.account-links button:focus-visible {
+  outline: 2px solid #547246;
+  outline-offset: 3px;
+}
+.account-form small {
+  display: block;
+  color: #687062;
+  margin-top: 8px;
+  font-weight: 400;
+}
+.account-form > .button {
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+  min-height: 44px;
+}
+.account-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+.account-links button {
+  background: none;
+  border: 0;
+  font-size: 12px;
+  color: #435c37;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.account-error,
+.account-notice {
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.account-error {
+  background: #faece7;
+  color: #8b3525;
+}
+.account-notice {
+  background: #eaf0e2;
+  color: #38522c;
+}
+@media (max-width: 760px) {
+  .account-page {
+    grid-template-columns: 1fr;
+  }
+  .account-story {
+    padding: 24px;
+    gap: 26px;
+  }
+  .account-story h1 {
+    font-size: 32px;
+  }
+  .account-story h1 + p,
+  .account-caption {
+    display: none;
+  }
+  .account-panel {
+    padding: 36px 24px;
+  }
+}
 .conversation-history {
   display: grid;
   gap: 24px;

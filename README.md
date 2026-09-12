@@ -6,6 +6,10 @@ A general-purpose agent workspace with observable tool execution, persisted prog
 
 ## Workspace
 
+Each new report produces PDF, Markdown and editable Word (`report.docx`) files. Download the Word version from the task's Files tab. Existing reports are preserved; send a follow-up to generate a new report with all three formats. DOCX includes findings, hypotheses, source IDs/URLs/excerpts and editable category-total tables.
+
+To remove an unwanted generated output, open the task's **Files** tab, choose **Delete file**, and confirm. This permanently removes that individual file and its download entry. Only the owner can delete it, and only after the task completes, fails, or is canceled. Original uploads and conversation history are preserved.
+
 Saved tasks support ongoing conversations. Open a task, use **Continue this conversation**, and send a follow-up to revise a report or analyze the same documents again. Previous messages and report downloads stay in that task; active conversations move to the top of history. Wait for the current run or cancel it before sending another message. Each new message gets a fresh execution budget and new Python approvals. Earlier outputs provide bounded model context, while original uploads remain available for reanalysis. Existing demo conversations remain demo conversations.
 
 The redesigned task desk includes a sample CSV loader, searchable history with real file counts, inline Markdown reports and charts, authenticated file previews/downloads, execution and source tabs, and a keyboard-accessible settings dialog. Saved tasks reopen directly from their URL. Mobile uses a navigation drawer; session changes clear stale task state. Automated accessibility checks cover the workspace, report and settings views on desktop and mobile.
@@ -164,3 +168,6 @@ With the `.env` already configured for demo, run `docker build -t autoagent-pyth
 For the full backend suite, create a dedicated PostgreSQL database named `autoagent_verification_local` using `docker compose exec -T postgres createdb -U autoagent autoagent_verification_local`. Run the sandbox service as a temporary test runner with `AUTOAGENT_TEST_DATABASE_URL` pointing to that database, `AUTOAGENT_CONTAINER_TESTS=1`, `AUTOAGENT_COMPOSE_TESTS=1`, and mount `backend/tests` read-only at `/app/tests`. Run `python -m pytest /app/tests -q -p no:cacheprovider`. The exact portable command is in `.github/workflows/verify.yml`. Tests reset only the explicitly named verification database; they do not reset the application database.
 
 The live evaluator now reads the root `.env`. Fill `LLM_API_KEY` and `LLM_MODEL`, then run `python -m evaluation.run --live` from `backend/`. Tavily search works keyless within its rate limits; optionally configure `TAVILY_API_KEY`. This uses real services and can incur provider charges. Authentication and broker secrets have been generated locally, not published.
+# Supabase accounts
+
+Account signup, login, password reset and saved per-user work are available with `AUTH_PROVIDER=supabase`. See [SUPABASE.md](SUPABASE.md) for configuration, storage locations and verification status. Local developer tokens remain an explicit alternative mode.

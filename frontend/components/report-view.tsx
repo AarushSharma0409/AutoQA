@@ -185,6 +185,15 @@ export function FileViewer({
           />
         ) : file.mime === "application/pdf" ? (
           <iframe src={preview.url} title="PDF report preview" />
+        ) : file.name.toLowerCase().endsWith(".docx") ? (
+          <div className="unavailable-preview">
+            <FileText size={30} />
+            <h3>Open this report in Word</h3>
+            <p>Download an editable report with findings, tables, and source excerpts.</p>
+            <button className="button primary" onClick={() => download(file)}>
+              <Download size={16} /> Download Word document
+            </button>
+          </div>
         ) : (
           <div className="unavailable-preview">
             <FileText size={30} />

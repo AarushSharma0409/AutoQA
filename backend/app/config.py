@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     auth_secret: str = ""
     auth_issuer: str = "autoagent"
     auth_audience: str = "autoagent-api"
+    auth_provider: Literal["local", "supabase"] = "local"
+    supabase_url: str = ""
+    supabase_publishable_key: str = ""
     llm_base_url: str = "https://api.openai.com/v1"
     llm_api_key: str = ""
     llm_model: str = ""
@@ -41,7 +44,13 @@ class Settings(BaseSettings):
     def validate_runtime(self):
         if self.mode not in {"demo", "live"}:
             raise ValueError("MODE must be demo or live")
-        if self.mode == "live" and (len(self.auth_secret) < 32 or not self.llm_api_key or not self.llm_model or len(self.sandbox_secret) < 32):
+        if self.auth_provider == "supabase":
+            import re
+            if not re.fullmatch(r"https://[a-z0-9]+\.supabase\.co", self.supabase_url):
+                raise ValueError("SUPABASE_URL must be the HTTPS project URL without a trailing slash")
+            if not self.supabase_publishable_key.startswith("sb_publishable_"):
+                raise ValueError("SUPABASE_PUBLISHABLE_KEY must be a public publishable key, never a secret key")
+        if self.mode == "live" and ((self.auth_provider == "local" and len(self.auth_secret) < 32) or not self.llm_api_key or not self.llm_model or len(self.sandbox_secret) < 32):
             raise ValueError("Live mode requires AUTH_SECRET, LLM_API_KEY, LLM_MODEL and SANDBOX_SECRET")
 
 

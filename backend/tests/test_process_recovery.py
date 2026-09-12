@@ -35,7 +35,7 @@ def test_killed_worker_replays_checkpoint(client):
         asyncio.run(run_task(task_id))
         task = client.get("/api/tasks/" + task_id).json()
         assert task["status"] == "completed"
-        assert len([f for f in task["files"] if f["kind"] == "artifact"]) == 2
+        assert len([f for f in task["files"] if f["kind"] == "artifact"]) == 3
         with Session() as db:
             assert any(e.kind == "recovery" for e in db.scalars(select(Event).where(Event.task_id == task_id)))
     finally:

@@ -32,6 +32,7 @@ import {
   X,
 } from "lucide-react";
 import { useWorkspace } from "../lib/use-workspace";
+import { Account, AccountGate } from "../components/account-gate";
 import {
   activeStates,
   bytesLabel,
@@ -208,8 +209,16 @@ function ExecutionLog({
   );
 }
 
-export default function Workspace() {
-  const { goalInput, uploadInput, ...w } = useWorkspace();
+export default function Page() {
+  return (
+    <AccountGate>{(account) => <Workspace account={account} />}</AccountGate>
+  );
+}
+
+function Workspace({ account }: { account?: Account }) {
+  const { goalInput, uploadInput, ...w } = useWorkspace(
+    account?.getAccessToken,
+  );
   const [view, setView] = useState<"workspace" | "history">("workspace");
   const [filter, setFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -1137,6 +1146,15 @@ export default function Workspace() {
                               Download
                               <ArrowDownToLine size={15} />
                             </button>
+                            <button
+                              className="file-card-download"
+                              aria-label={`Delete ${file.name}`}
+                              disabled={w.busy || !["completed", "failed", "canceled"].includes(w.task?.status || "")}
+                              title="Delete this generated file permanently"
+                              onClick={() => void w.deleteFile(file)}
+                            >
+                              Delete file
+                            </button>
                           </article>
                         ))}
                       </div>
@@ -1319,48 +1337,71 @@ export default function Workspace() {
               Limits and provider keys are configured on the server.
             </p>
           </section>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              w.applyToken(tokenDraft);
-              setTokenDraft("");
-              settingsDialog.current?.close();
-            }}
-          >
-            <label htmlFor="access-token">Live access token</label>
-            <input
-              id="access-token"
-              type="password"
-              autoComplete="off"
-              value={tokenDraft}
-              onChange={(e) => setTokenDraft(e.target.value)}
-              placeholder="Paste a server-issued token"
-            />
-            <p className="settings-note">
-              Kept in memory for this session. It is cleared when you reload.
-            </p>
-            <div className="dialog-actions">
+          {account ? (
+            <section>
+              <h3>Your account</h3>
+              <p className="settings-note">{account.email}</p>
+              <p className="settings-note">
+                Your tasks and files are saved to your account.
+              </p>
               <button
                 type="button"
                 className="button secondary"
-                onClick={() => {
-                  w.applyToken("");
-                  setTokenDraft("");
-                  settingsDialog.current?.close();
+                onClick={async () => {
+                  try {
+                    await account.signOut();
+                  } catch (error) {
+                    w.setError((error as Error).message);
+                  }
                 }}
               >
-                Clear session
+                Sign out
               </button>
-              <button
-                className="button primary"
-                type="submit"
-                disabled={!tokenDraft.trim()}
-              >
-                Apply token
-                <ArrowRight size={15} />
-              </button>
-            </div>
-          </form>
+            </section>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                w.applyToken(tokenDraft);
+                setTokenDraft("");
+                settingsDialog.current?.close();
+              }}
+            >
+              <label htmlFor="access-token">Live access token</label>
+              <input
+                id="access-token"
+                type="password"
+                autoComplete="off"
+                value={tokenDraft}
+                onChange={(e) => setTokenDraft(e.target.value)}
+                placeholder="Paste a server-issued token"
+              />
+              <p className="settings-note">
+                Kept in memory for this session. It is cleared when you reload.
+              </p>
+              <div className="dialog-actions">
+                <button
+                  type="button"
+                  className="button secondary"
+                  onClick={() => {
+                    w.applyToken("");
+                    setTokenDraft("");
+                    settingsDialog.current?.close();
+                  }}
+                >
+                  Clear session
+                </button>
+                <button
+                  className="button primary"
+                  type="submit"
+                  disabled={!tokenDraft.trim()}
+                >
+                  Apply token
+                  <ArrowRight size={15} />
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </dialog>
     </div>

@@ -25,11 +25,17 @@ def test_csv_research_report(client):
     assert task["status"] == "completed", task
     assert task["usage"]["tokens"] == 0
     assert task["sources"][0]["fixture"] is True
-    assert len(task["files"]) == 5
+    assert len(task["files"]) == 6
     saved = next(t for t in client.get("/api/tasks").json() if t["id"] == task_id)
-    assert saved["artifact_count"] == 4
+    assert saved["artifact_count"] == 5
     for f in task["files"]:
         data = client.get("/api/files/" + f["id"]).content
+        if f["name"].endswith(".docx"):
+            from docx import Document
+            document = Document(io.BytesIO(data))
+            word_text = "\n".join(p.text for p in document.paragraphs)
+            assert "DEMO" in word_text and "Fictional sample" in word_text
+            assert document.tables
         if f["name"].endswith(".pdf"):
             text = "\n".join(p.extract_text() for p in PdfReader(io.BytesIO(data)).pages)
             assert "DEMO" in text and "Games (5.00)" in text
@@ -56,7 +62,7 @@ def test_research_report(client):
     task = client.get(f"/api/tasks/{task_id}").json()
     assert task["status"] == "completed"
     assert len(task["sources"]) == 1
-    assert {f["name"] for f in task["files"]} == {"report.pdf", "report.md"}
+    assert {f["name"] for f in task["files"]} == {"report.pdf", "report.md", "report.docx"}
 
 
 def test_csv_chart_spreadsheet(client):
@@ -94,7 +100,7 @@ def test_multiple_uploads_are_all_used(client):
     task = client.get("/api/tasks/" + task_id).json()
     assert task["status"] == "completed"
     names = [f["name"] for f in task["files"] if f["kind"] == "artifact"]
-    assert len(names) == len(set(names)) == 6
+    assert len(names) == len(set(names)) == 7
     report = next(f for f in task["files"] if f["name"] == "report.md")
     content = client.get("/api/files/" + report["id"]).text
     assert first in content and second in content

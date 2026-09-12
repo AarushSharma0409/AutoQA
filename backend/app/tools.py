@@ -351,9 +351,13 @@ def report(args, checkpoint, mode):
         canvas.drawString(48, 28, f"AutoAgent | {mode.upper()} | Page {doc.page}")
 
     SimpleDocTemplate(out, rightMargin=48, leftMargin=48, topMargin=42, bottomMargin=48).build(story, onFirstPage=footer, onLaterPages=footer)
+    from .word_report import word_report
+
+    docx_bytes = word_report(args, checkpoint, sources, label)
     return {"summary": args.title, "source_ids": args.source_ids}, [
         artifact("report.md", "text/markdown", markdown.encode()),
         artifact("report.pdf", "application/pdf", out.getvalue()),
+        artifact("report.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", docx_bytes),
     ]
 
 

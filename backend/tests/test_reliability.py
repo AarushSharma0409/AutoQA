@@ -64,6 +64,6 @@ def test_report_requires_inline_evidence():
     with pytest.raises(ValueError, match="inline"):
         report(Report(title="Report", findings="Value is 10", hypotheses="", source_ids=["s1"]), cp, "live")
     result, artifacts = report(Report(title="Report", findings="Value is 10 [s1]", hypotheses="", source_ids=["s1"]), cp, "live")
-    assert result["source_ids"] == ["s1"] and len(artifacts) == 2
+    assert result["source_ids"] == ["s1"] and len(artifacts) == 3
     with pytest.raises(ValueError, match="numbers absent"):
         report(Report(title="Report", findings="Value is 99 [s1]", hypotheses="", source_ids=["s1"]), cp, "live")
