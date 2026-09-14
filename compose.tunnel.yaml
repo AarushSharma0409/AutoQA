@@ -1,0 +1,17 @@
+# Optional sharing for demos. Only the web gateway is forwarded.
+# Start with: docker compose -f compose.yaml -f compose.tunnel.yaml up -d tunnel
+services:
+  tunnel:
+    image: ngrok/ngrok:latest
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:?Set NGROK_AUTHTOKEN in the ignored local .env file}
+    command:
+      - http
+      - http://gateway:8080
+      - --url=${NGROK_URL:?Set the full HTTPS URL assigned by ngrok in .env}
+      - --inspect=false
+    depends_on:
+      gateway: {condition: service_healthy}
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    restart: "no"

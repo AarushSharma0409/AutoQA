@@ -1,0 +1,13 @@
+# Local database browser; never route this service through the public gateway.
+services:
+  studio:
+    image: node:22.15-alpine
+    working_dir: /tmp
+    command: ["node", "/opt/studio.mjs"]
+    volumes: ["./scripts/studio.mjs:/opt/studio.mjs:ro", "studio_npm:/root/.npm"]
+    ports: ["127.0.0.1:5555:5555"]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    restart: "no"
+volumes:
+  studio_npm:
